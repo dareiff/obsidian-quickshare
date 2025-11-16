@@ -5,7 +5,7 @@ import Component from "./SharedNoteSuccessComponent.svelte";
 
 export class SharedNoteSuccessModal extends Modal {
 	private url: string;
-	private component: Component;
+	private component!: Component;
 	private expire_time: Moment;
 
 	constructor(plugin: NoteSharingPlugin, url: string, expire_time: Moment) {

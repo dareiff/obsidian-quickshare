@@ -2,7 +2,7 @@ import { updateReactiveCache } from "../stores/CacheStore";
 
 export type QuickShareData = {
 	shared_datetime: string;
-	updated_datetime: string;
+	updated_datetime?: string;
 	expire_datetime: string;
 	view_url: string;
 	secret_token: string;

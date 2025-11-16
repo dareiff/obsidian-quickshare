@@ -11,8 +11,20 @@
 	import { onMount } from "svelte";
 	import ActiveCacheFile from "src/lib/stores/ActiveCacheFile";
 
-	let data: QuickShareDataList;
-	let filteredData: QuickShareDataList;
+	// Trigger for forcing re-renders to update timestamps
+	let renderTrigger = $state(0);
+
+	let data = $derived.by(() => {
+		// Access renderTrigger to make this reactive to it
+		renderTrigger;
+		return $CacheStore;
+	});
+
+	let filteredData = $derived(
+		data?.filter(
+			(d) => !deletedFromServer(d) && !(deletedFromVault(d) && hasExpired(d))
+		)
+	);
 
 	function hasExpired(data: QuickShareData) {
 		const expiration = moment(data.expire_datetime);
@@ -86,15 +98,10 @@
 		$PluginStore.shareNote(file);
 	}
 
-	$: data = $CacheStore;
-	$: filteredData = data?.filter(
-		(d) => !deletedFromServer(d) && !(deletedFromVault(d) && hasExpired(d))
-	);
-
 	onMount(() => {
 		// Force a rerender every 30 seconds to update rendered timestamps
 		const timer = window.setInterval(() => {
-			data = [...$CacheStore];
+			renderTrigger++;
 		}, 30_000);
 		$PluginStore.registerInterval(timer);
 		return () => {
@@ -129,7 +136,7 @@
 			</div>
 			<div class="content-right">
 				{#if !$ActiveCacheFile?.cache || !isShared($ActiveCacheFile?.cache)}
-					<button on:click={() => onShare($ActiveCacheFile.file)}
+					<button onclick={() => onShare($ActiveCacheFile.file)}
 						>Share</button
 					>
 				{:else}
@@ -137,13 +144,13 @@
 						<IconButton
 							icon="reset"
 							size="xs"
-							on:click={() => onShare($ActiveCacheFile.file)}
+							onclick={() => onShare($ActiveCacheFile.file)}
 							tooltip="Share again"
 						/>
 						<IconButton
 							icon="trash"
 							size="xs"
-							on:click={() =>
+							onclick={() =>
 								onUnshare($ActiveCacheFile?.cache.fileId)}
 							tooltip="Remove access"
 						/>
@@ -173,7 +180,7 @@
 					<div class="item-row">
 						<div
 							class="item-description"
-							on:click={() =>
+							onclick={() =>
 								!deletedFromVault(item) &&
 								onOpenNote(item.fileId)}
 						>
@@ -195,13 +202,13 @@
 								<IconButton
 									icon="open-elsewhere-glyph"
 									size="xs"
-									on:click={() => onOpen(item.view_url)}
+									onclick={() => onOpen(item.view_url)}
 									tooltip="Open in browser"
 								/>
 								<IconButton
 									icon="trash"
 									size="xs"
-									on:click={() => onUnshare(item.fileId)}
+									onclick={() => onUnshare(item.fileId)}
 									tooltip="Remove access"
 								/>
 							</div>

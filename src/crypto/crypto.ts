@@ -13,7 +13,7 @@ interface EncryptedData {
  */
 export async function generateKey(seed: string): Promise<ArrayBuffer> {
 	const _seed = new TextEncoder().encode(seed);
-	return _generateKey(_seed);
+	return _generateKey(_seed.buffer);
 }
 
 /**
@@ -21,7 +21,7 @@ export async function generateKey(seed: string): Promise<ArrayBuffer> {
  */
 export async function generateRandomKey(): Promise<ArrayBuffer> {
 	const seed = window.crypto.getRandomValues(new Uint8Array(64));
-	return _generateKey(seed);
+	return _generateKey(seed.buffer);
 }
 
 async function _generateKey(seed: ArrayBuffer) {
@@ -44,7 +44,7 @@ async function _generateKey(seed: ArrayBuffer) {
 		256
 	);
 
-	return new Uint8Array(masterKey);
+	return masterKey;
 }
 
 export function masterKeyToString(masterKey: ArrayBuffer): string {
@@ -67,7 +67,7 @@ export async function encryptString(
 
 	const ciphertext = arrayBufferToBase64(buf_ciphertext);
 
-	return { ciphertext, iv: arrayBufferToBase64(iv) };
+	return { ciphertext, iv: arrayBufferToBase64(iv.buffer) };
 }
 
 export async function decryptString(
@@ -94,7 +94,7 @@ export function arrayBufferToBase64(buffer: ArrayBuffer): string {
 }
 
 export function base64ToArrayBuffer(base64: string): ArrayBuffer {
-	return Uint8Array.from(window.atob(base64), (c) => c.charCodeAt(0));
+	return Uint8Array.from(window.atob(base64), (c) => c.charCodeAt(0)).buffer;
 }
 
 function _getAesGcmKey(secret: ArrayBuffer): Promise<CryptoKey> {

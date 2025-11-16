@@ -11,20 +11,21 @@ function _getFrontmatterKey(
 	file: TFile,
 	key: FrontmatterKey,
 	app: App
-): string {
-	const fmCache = app.metadataCache.getFileCache(file).frontmatter;
-	return fmCache?.[keyTypetoFrontmatterKey[key]] || undefined;
+): string | undefined {
+	const fmCache = app.metadataCache.getFileCache(file)?.frontmatter;
+	return fmCache?.[keyTypetoFrontmatterKey[key]];
 }
 
 function _setFrontmatterKey(
 	file: TFile,
 	key: FrontmatterKey,
 	value: string,
-	content: string
-) {
+	content: string,
+	app: App
+): string {
 	if (_getFrontmatterKey(file, key, app) === value) {
 		console.log("returning");
-		return;
+		return content;
 	}
 
 	if (_getFrontmatterKey(file, key, app) !== undefined) {
@@ -61,7 +62,8 @@ async function _setFrontmatterKeys(
 				file,
 				key as FrontmatterKey,
 				value,
-				content
+				content,
+				app
 			);
 		}
 	}
