@@ -47,12 +47,12 @@
 	class:icon-md={size === "md"}
 	class:icon-lg={size === "lg"}
 	aria-label={tooltip}
+	aria-disabled={disabled}
 	role="button"
 	tabindex="0"
 	use:useIcon={icon}
 	{onclick}
 	{onkeypress}
-	{disabled}
 ></div>
 
 <style>

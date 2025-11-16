@@ -1,6 +1,8 @@
 {
 	"extends": "@tsconfig/svelte/tsconfig.json",
 	"compilerOptions": {
+		"verbatimModuleSyntax": true,
+		"skipLibCheck": true,
 		"types": ["node"],
 		"baseUrl": ".",
 		"inlineSources": true,
@@ -15,5 +17,5 @@
 		"lib": ["dom", "ES5", "ES6", "ES7"],
 		"typeRoots": ["./node_modules/@types", "./src/types"]
 	},
-	"include": ["**/*.ts"]
+	"include": ["**/*.ts", "**/*.svelte"]
 }

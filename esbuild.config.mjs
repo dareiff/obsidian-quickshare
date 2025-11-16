@@ -4,7 +4,7 @@ import builtins from "builtin-modules";
 
 import eslint from "esbuild-plugin-eslint";
 import esbuildSvelte from "esbuild-svelte";
-import sveltePreprocess from "svelte-preprocess";
+import { sveltePreprocess } from "svelte-preprocess";
 
 import { config } from "dotenv";
 import { join } from "path";
@@ -26,7 +26,7 @@ if (!prod) {
 	copyFileSync("./manifest.json", join(dir, "manifest.json"));
 	writeFileSync(
 		join(dir, ".hotreload"),
-		"This file is used to enable hot reloading using the Hot Reload plugin. See https://github.com/pjeby/hot-reload for more information."
+		"This file is used to enable hot reloading using the Hot Reload plugin. See https://github.com/pjeby/hot-reload for more information.",
 	);
 }
 
@@ -39,7 +39,7 @@ const buildOptions = {
 	plugins: [
 		esbuildSvelte({
 			compilerOptions: {
-				css: 'injected',
+				css: "injected",
 				// Svelte 5 runes mode
 				runes: true,
 			},
@@ -85,5 +85,8 @@ const buildOptions = {
 if (prod) {
 	esbuild.build(buildOptions).catch(() => process.exit(1));
 } else {
-	esbuild.context(buildOptions).then(ctx => ctx.watch()).catch(() => process.exit(1));
+	esbuild
+		.context(buildOptions)
+		.then((ctx) => ctx.watch())
+		.catch(() => process.exit(1));
 }

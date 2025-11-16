@@ -69,12 +69,14 @@
 	}
 
 	function onOpenNote(fileId: string) {
+		if (!$PluginStore) return;
+
 		let leafFound = false;
 		$PluginStore.app.workspace.iterateRootLeaves((leaf) => {
 			if (leaf.view instanceof MarkdownView) {
 				const view = leaf.view as MarkdownView;
-				if (view.file.path === fileId) {
-					$PluginStore.app.workspace.setActiveLeaf(leaf);
+				if (view.file?.path === fileId) {
+					$PluginStore?.app.workspace.setActiveLeaf(leaf);
 					leafFound = true;
 				}
 			}
@@ -91,11 +93,11 @@
 	}
 
 	function onUnshare(fileId: string) {
-		$PluginStore.deleteNote(fileId);
+		$PluginStore?.deleteNote(fileId);
 	}
 
 	function onShare(file: TFile) {
-		$PluginStore.shareNote(file);
+		$PluginStore?.shareNote(file);
 	}
 
 	onMount(() => {
@@ -103,7 +105,7 @@
 		const timer = window.setInterval(() => {
 			renderTrigger++;
 		}, 30_000);
-		$PluginStore.registerInterval(timer);
+		$PluginStore?.registerInterval(timer);
 		return () => {
 			clearInterval(timer);
 		};
@@ -115,7 +117,7 @@
 		<div id="current-file">
 			<div class="content-left">
 				<div
-					class="share-info {!isShared($ActiveCacheFile?.cache) &&
+					class="share-info {(!$ActiveCacheFile?.cache || !isShared($ActiveCacheFile.cache)) &&
 						'share-info--not-shared'}"
 				>
 					<div class="share-info-top">
@@ -123,7 +125,7 @@
 							long: true,
 						})}
 					</div>
-					{#if isShared($ActiveCacheFile?.cache) && $ActiveCacheFile?.cache?.view_url}
+					{#if $ActiveCacheFile?.cache && isShared($ActiveCacheFile.cache) && $ActiveCacheFile.cache.view_url}
 						<a
 							class="share-info-sub"
 							href={$ActiveCacheFile?.cache?.view_url}
@@ -135,7 +137,7 @@
 				</div>
 			</div>
 			<div class="content-right">
-				{#if !$ActiveCacheFile?.cache || !isShared($ActiveCacheFile?.cache)}
+				{#if !$ActiveCacheFile?.cache || !isShared($ActiveCacheFile.cache)}
 					<button onclick={() => onShare($ActiveCacheFile.file)}
 						>Share</button
 					>
@@ -151,7 +153,7 @@
 							icon="trash"
 							size="xs"
 							onclick={() =>
-								onUnshare($ActiveCacheFile?.cache.fileId)}
+								$ActiveCacheFile.cache && onUnshare($ActiveCacheFile.cache.fileId)}
 							tooltip="Remove access"
 						/>
 					</div>
@@ -166,22 +168,29 @@
 		<div class="history-header">Recently shared</div>
 		<div class="history-list">
 			{#each filteredData as item}
-				<!-- svelte-ignore a11y-unknown-aria-attribute -->
 				<div
-					aria-label={!deletedFromVault(item)
-						? `Click to open note`
-						: undefined}
-					aria-label-position="left"
-					class="history-item 
+					class="history-item
 					{hasExpired(item) && 'history-item--expired'}
 					{deletedFromServer(item) && 'history-item--deleted-server'}
 					{deletedFromVault(item) && 'history-item--deleted-vault'}"
 				>
 					<div class="item-row">
+						<!-- svelte-ignore a11y_click_events_have_key_events -->
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
+						<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 						<div
 							class="item-description"
+							role={!deletedFromVault(item) ? "button" : undefined}
+							tabindex={!deletedFromVault(item) ? 0 : undefined}
+							aria-label={!deletedFromVault(item)
+								? `Click to open note`
+								: undefined}
 							onclick={() =>
 								!deletedFromVault(item) &&
+								onOpenNote(item.fileId)}
+							onkeydown={(e) =>
+								!deletedFromVault(item) &&
+								(e.key === "Enter" || e.key === " ") &&
 								onOpenNote(item.fileId)}
 						>
 							<div class="item-name">
@@ -295,12 +304,6 @@
 				.item-sub {
 					font-size: 85%;
 					color: var(--text-faint);
-				}
-
-				.item-deleted-vault {
-					font-size: 85%;
-					color: var(--text-error);
-					margin-top: 4px;
 				}
 
 				&:hover {

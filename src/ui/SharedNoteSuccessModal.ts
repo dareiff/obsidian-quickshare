@@ -1,11 +1,12 @@
 import type NoteSharingPlugin from "main";
 import { Modal } from "obsidian";
 import type { Moment } from "moment";
-import Component from "./SharedNoteSuccessComponent.svelte";
+import { mount, unmount } from "svelte";
+import SharedNoteSuccessComponent from "./SharedNoteSuccessComponent.svelte";
 
 export class SharedNoteSuccessModal extends Modal {
 	private url: string;
-	private component!: Component;
+	private component!: ReturnType<typeof mount>;
 	private expire_time: Moment;
 
 	constructor(plugin: NoteSharingPlugin, url: string, expire_time: Moment) {
@@ -20,7 +21,7 @@ export class SharedNoteSuccessModal extends Modal {
 	}
 
 	async onOpen() {
-		this.component = new Component({
+		this.component = mount(SharedNoteSuccessComponent, {
 			target: this.contentEl,
 			props: {
 				url: this.url,
@@ -30,6 +31,6 @@ export class SharedNoteSuccessModal extends Modal {
 	}
 
 	async onClose() {
-		this.component.$destroy();
+		unmount(this.component);
 	}
 }
