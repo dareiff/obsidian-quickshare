@@ -22,16 +22,16 @@ import { QuickShareSideView } from "src/ui/QuickShareSideView";
 import { writable } from "svelte/store";
 import { setActiveMdFile } from "src/lib/stores/ActiveMdFile";
 
-const { subscribe, set: setPluginStore } = writable<NoteSharingPlugin>(null);
+const { subscribe, set: setPluginStore } = writable<NoteSharingPlugin | undefined>(undefined);
 
 export const PluginStore = { subscribe };
 
 export default class NoteSharingPlugin extends Plugin {
-	public settings: PluginSettings;
-	private noteSharingService: NoteSharingService;
-	private cache: QuickShareCache;
+	public settings!: PluginSettings;
+	private noteSharingService!: NoteSharingService;
+	private cache!: QuickShareCache;
 
-	private fileMenuEvent: EventRef;
+	private fileMenuEvent!: EventRef;
 
 	async onload() {
 		setPluginStore(this);
@@ -85,7 +85,7 @@ export default class NoteSharingPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on("active-leaf-change", (leaf) => {
-				if (leaf.view instanceof MarkdownView) {
+				if (leaf && leaf.view instanceof MarkdownView) {
 					setActiveMdFile(leaf.view.file);
 				}
 			})
@@ -108,10 +108,13 @@ export default class NoteSharingPlugin extends Plugin {
 		) {
 			return;
 		}
-		await this.app.workspace.getRightLeaf(false).setViewState({
-			type: QuickShareSideView.viewType,
-			active: true,
-		});
+		const leaf = this.app.workspace.getRightLeaf(false);
+		if (leaf) {
+			await leaf.setViewState({
+				type: QuickShareSideView.viewType,
+				active: true,
+			});
+		}
 	}
 
 	onunload() {}
@@ -140,7 +143,7 @@ export default class NoteSharingPlugin extends Plugin {
 				// Only works on Markdown views
 				const activeView =
 					this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (!activeView) return false;
+				if (!activeView || !activeView.file) return false;
 				if (checking) return true;
 				this.shareNote(activeView.file);
 			},
@@ -153,11 +156,12 @@ export default class NoteSharingPlugin extends Plugin {
 				// Only works on Markdown views
 				const activeView =
 					this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (!activeView) return false;
+				if (!activeView || !activeView.file) return false;
 
+				const cacheData = this.cache.get(activeView.file.path);
 				if (
 					(checking && !this.cache.has(activeView.file.path)) ||
-					this.cache.get(activeView.file.path).deleted_from_server
+					(cacheData && cacheData.deleted_from_server)
 				) {
 					return false;
 				}
@@ -207,7 +211,7 @@ export default class NoteSharingPlugin extends Plugin {
 				// NOTE: this is an async call, but we don't need to wait for it
 				this.cache.set(file.path, {
 					shared_datetime: moment().toISOString(),
-					updated_datetime: null,
+					updated_datetime: undefined,
 					expire_datetime: res.expire_time.toISOString(),
 					view_url: res.view_url,
 					secret_token: res.secret_token,

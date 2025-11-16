@@ -5,7 +5,7 @@ export class QuickShareSideView extends ItemView {
 
 	public navigation = false;
 
-	private component: QuickShareSideViewComponent;
+	private component!: QuickShareSideViewComponent;
 
 	constructor(leaf: WorkspaceLeaf) {
 		super(leaf);

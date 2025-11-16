@@ -30,52 +30,60 @@ if (!prod) {
 	);
 }
 
-esbuild
-	.build({
-		banner: {
-			js: banner,
-		},
-		entryPoints: ["main.ts"],
-		bundle: true,
-		plugins: [
-			esbuildSvelte({
-				compilerOptions: { css: true },
-				preprocess: sveltePreprocess(),
-			}),
-			eslint(),
-		],
-		external: [
-			"obsidian",
-			"electron",
-			"@codemirror/autocomplete",
-			"@codemirror/closebrackets",
-			"@codemirror/collab",
-			"@codemirror/commands",
-			"@codemirror/comment",
-			"@codemirror/fold",
-			"@codemirror/gutter",
-			"@codemirror/highlight",
-			"@codemirror/history",
-			"@codemirror/language",
-			"@codemirror/lint",
-			"@codemirror/matchbrackets",
-			"@codemirror/panel",
-			"@codemirror/rangeset",
-			"@codemirror/rectangular-selection",
-			"@codemirror/search",
-			"@codemirror/state",
-			"@codemirror/stream-parser",
-			"@codemirror/text",
-			"@codemirror/tooltip",
-			"@codemirror/view",
-			...builtins,
-		],
-		format: "cjs",
-		watch: !prod,
-		target: "es2016",
-		logLevel: "info",
-		sourcemap: prod ? false : "inline",
-		treeShaking: true,
-		outfile: outfile,
-	})
-	.catch(() => process.exit(1));
+const buildOptions = {
+	banner: {
+		js: banner,
+	},
+	entryPoints: ["main.ts"],
+	bundle: true,
+	plugins: [
+		esbuildSvelte({
+			compilerOptions: {
+				css: 'injected',
+				// Svelte 5 runes mode
+				runes: true,
+			},
+			preprocess: sveltePreprocess(),
+		}),
+		// ESLint plugin disabled - run ESLint separately with flat config
+		// eslint(),
+	],
+	external: [
+		"obsidian",
+		"electron",
+		"@codemirror/autocomplete",
+		"@codemirror/closebrackets",
+		"@codemirror/collab",
+		"@codemirror/commands",
+		"@codemirror/comment",
+		"@codemirror/fold",
+		"@codemirror/gutter",
+		"@codemirror/highlight",
+		"@codemirror/history",
+		"@codemirror/language",
+		"@codemirror/lint",
+		"@codemirror/matchbrackets",
+		"@codemirror/panel",
+		"@codemirror/rangeset",
+		"@codemirror/rectangular-selection",
+		"@codemirror/search",
+		"@codemirror/state",
+		"@codemirror/stream-parser",
+		"@codemirror/text",
+		"@codemirror/tooltip",
+		"@codemirror/view",
+		...builtins,
+	],
+	format: "cjs",
+	target: "es2016",
+	logLevel: "info",
+	sourcemap: prod ? false : "inline",
+	treeShaking: true,
+	outfile: outfile,
+};
+
+if (prod) {
+	esbuild.build(buildOptions).catch(() => process.exit(1));
+} else {
+	esbuild.context(buildOptions).then(ctx => ctx.watch()).catch(() => process.exit(1));
+}

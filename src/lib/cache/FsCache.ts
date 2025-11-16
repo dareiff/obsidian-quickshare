@@ -7,7 +7,7 @@ import {
 
 export class FsCache extends AbstractCache {
 	private _app: App;
-	private _cache: CacheObject;
+	private _cache!: CacheObject;
 
 	constructor(app: App) {
 		super();
@@ -33,9 +33,9 @@ export class FsCache extends AbstractCache {
 
 	private async _fetchCache(): Promise<void> {
 		try {
-			const jsonString = await app.vault.adapter.read(this._cachePath);
+			const jsonString = await this._app.vault.adapter.read(this._cachePath);
 			this._cache = JSON.parse(jsonString) as CacheObject;
-		} catch (e) {
+		} catch {
 			this._cache = {};
 		}
 	}

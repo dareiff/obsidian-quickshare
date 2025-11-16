@@ -1,33 +1,41 @@
 <script lang="ts">
 	import { useIcon } from ".";
 
-	/**
-	 * Specifies the icon identifier. Visit https://lucide.dev for all valid
-	 * identifiers.
-	 */
-	export let icon: string;
-
-	/**
-	 * Specifies the width and height of the icon in pixels. Defaults to 16px.
-	 */
-	export let size: "xs" | "sm" | "md" | "lg" = "md";
-
-	/**
-	 * Specifies whether icon is active.
-	 */
-	export let active: boolean = false;
-
-	/**
-	 * Specifies the tooltip.
-	 */
-	export let tooltip: string = "";
-
-	/**
-	 * Specifies whether to remove the default padding.
-	 */
-	export let nopadding: boolean = false;
-
-	export let disabled: boolean = false;
+	let {
+		icon,
+		size = "md",
+		active = false,
+		tooltip = "",
+		nopadding = false,
+		disabled = false,
+		onclick,
+		onkeypress
+	}: {
+		/**
+		 * Specifies the icon identifier. Visit https://lucide.dev for all valid
+		 * identifiers.
+		 */
+		icon: string;
+		/**
+		 * Specifies the width and height of the icon in pixels. Defaults to 16px.
+		 */
+		size?: "xs" | "sm" | "md" | "lg";
+		/**
+		 * Specifies whether icon is active.
+		 */
+		active?: boolean;
+		/**
+		 * Specifies the tooltip.
+		 */
+		tooltip?: string;
+		/**
+		 * Specifies whether to remove the default padding.
+		 */
+		nopadding?: boolean;
+		disabled?: boolean;
+		onclick?: (event: MouseEvent) => void;
+		onkeypress?: (event: KeyboardEvent) => void;
+	} = $props();
 </script>
 
 <div
@@ -39,11 +47,13 @@
 	class:icon-md={size === "md"}
 	class:icon-lg={size === "lg"}
 	aria-label={tooltip}
+	role="button"
+	tabindex="0"
 	use:useIcon={icon}
-	on:click
-	on:keypress
+	{onclick}
+	{onkeypress}
 	{disabled}
-/>
+></div>
 
 <style>
 	.nopadding {
