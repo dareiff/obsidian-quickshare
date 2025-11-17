@@ -1,7 +1,7 @@
 {
 	"name": "obsidian-note-sharing",
 	"version": "2.0.0",
-	"description": "Obsidian plugin for encrypting and uploading notes to noteshare.space.",
+	"description": "Obsidian plugin for end-to-end encrypted note sharing with customizable backends.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
@@ -13,7 +13,7 @@
 		"svelte-check": "svelte-check --tsconfig tsconfig.json"
 	},
 	"keywords": [],
-	"author": "Maxime Cannoodt (@mcndt)",
+	"author": "Derek Reiff (@dareiff)",
 	"license": "MIT",
 	"devDependencies": {
 		"@tsconfig/svelte": "^5.0.6",

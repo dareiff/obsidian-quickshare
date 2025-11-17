@@ -1,5 +1,19 @@
 # Changelog
 
+## Fork Maintenance
+
+**Note**: This is a fork maintained by Derek Reiff (@dareiff). The original plugin was created by Maxime Cannoodt (@mcndt). Historical references to `noteshare.space` URLs below refer to the original service which is no longer active. This fork continues development with support for self-hosted backends.
+
+### [2.0.0] - 2025
+
+- chore: Modernize plugin to ESLint 9 and Svelte 5
+- chore: Update metadata and documentation for fork maintenance
+- chore: Update deployment documentation links to fork repository
+
+---
+
+## Original Plugin Changelog
+
 ## [1.3.1]
 
 -   fix: Make sidebar pane non-navigable (Thanks [kometenstaub](https://github.com/mcndt/obsidian-quickshare/issues/27))
