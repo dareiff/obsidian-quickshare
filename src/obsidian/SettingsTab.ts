@@ -91,7 +91,7 @@ export default class SettingsTab extends PluginSettingTab {
 		new Setting(this.selfHostSettings)
 			.setName("Server URL")
 			.setDesc(
-				"Server URL hosting the encrypted notes. For more information about self-hosting, see https://github.com/mcndt/noteshare.space#deployment"
+				"Server URL hosting the encrypted notes. For more information about self-hosting, see https://github.com/dareiff/noteshare.space#deployment"
 			)
 			.addText((text) => {
 				this.selfHostedUrl = text;
